@@ -84,7 +84,7 @@ def convert_mth_strings ( mth_string ):
 #### VARIABLES 1.0
 
 entity_id = "NHTRX5NFT_GWASNT_gov"
-url = "http://www.nwas.nhs.uk/talking-to-us/freedom-of-information/classes-of-information/what-we-spend-and-how-we-spend-it/"
+url = "https://data.gov.uk/dataset/payments-to-suppliers-with-a-value-over-25000-from-north-west-ambulance-service-nhs-trust"
 errors = 0
 data = []
 
@@ -96,19 +96,20 @@ soup = BeautifulSoup(html, 'lxml')
 
 #### SCRAPE DATA
 
-blocks = soup.find('div', id='ContentPlaceHolderDefault_MasterContentPlaceholder_ContentPanel').find_all('a')
+blocks = soup.find_all('div', 'dropdown')
 for block in blocks:
-    if '.csv' in block['href'] or '.xls' in block['href'] or '.xlsx' in block['href'] or '.pdf' in block['href']:
-        link = 'http://www.nwas.nhs.uk'+block['href']
-        if 'foi' in link:
-            continue
-        title = block.text.strip()
-        csvMth = title[:3]
-        csvYr = '20'+link.split('.')[-2][-2:]
-        if '-' in title:
-            csvMth = 'Q0'
+    file_url = ''
+    try:
+        file_url = block.find('ul', 'dropdown-menu').find_all('li')[1].find('a')['href']
+    except:
+        pass
+    if '.csv' in file_url or '.xls' in file_url:
+        url = file_url
+        title = block.find_previous('div', 'dataset-resource-text').text.strip()
+        csvMth = title.split('/')[0]
+        csvYr = title.split('/')[-1][:4]
         csvMth = convert_mth_strings(csvMth.upper())
-        data.append([csvYr, csvMth, link])
+        data.append([csvYr, csvMth, url])
 
 
 #### STORE DATA 1.0
