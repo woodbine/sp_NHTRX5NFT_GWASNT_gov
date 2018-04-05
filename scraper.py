@@ -110,6 +110,10 @@ for block in blocks:
         csvYr = '20'+link.split('.')[-2][-2:]
         if '-' in title:
             csvMth = 'Q0'
+        if 'nd' in csvYr:
+            csvYr = '20'+link.split('-')[1]
+        if 'over' in csvYr:
+            csvYr = '2017'
         csvMth = convert_mth_strings(csvMth.upper())
         data.append([csvYr, csvMth, link])
 
